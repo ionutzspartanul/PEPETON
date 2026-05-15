@@ -877,38 +877,33 @@ function renderDailyTasks(){
   const el = document.getElementById("daily-tasks-list");
   if(!el) return;
   checkDailyReset();
-  el.innerHTML = DAILY_TASKS.map(t => {
+  el.innerHTML = DAILY_TASKS.map(function(t){
     const done = dailyTasksDone.includes(t.id);
     let progress = 0;
     if(t.id === "d_tap") progress = Math.min(tapCount, t.target);
     if(t.id === "d_open") progress = Math.min(openCount, t.target);
     if(t.id === "d_energy") progress = energy <= 0 ? 1 : 0;
     const pct = t.target > 1 ? Math.round(progress/t.target*100) : (done?100:0);
-    return \`
-    <div class="task-card \${done?"done":""}">
-      <div class="task-check">\${done?"✓":""}</div>
-      <div style="font-size:20px;flex-shrink:0;">\${t.icon}</div>
-      <div class="task-label" style="flex:1;">
-        <div>\${t.label}</div>
-        \${t.target > 1 ? \`<div style="margin-top:4px;"><div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:\${pct}%;background:var(--gold);border-radius:2px;"></div></div></div>\` : ""}
-      </div>
-      <div class="task-pts">+\${t.pts} $PTON</div>
-    </div>\`;
+    const progressBar = t.target > 1 ? '<div style="margin-top:4px;"><div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--gold);border-radius:2px;"></div></div></div>' : "";
+    return '<div class="task-card '+(done?"done":"")+'"><div class="task-check">'+(done?"✓":"")+'</div><div style="font-size:20px;flex-shrink:0;">'+t.icon+'</div><div class="task-label" style="flex:1;"><div>'+t.label+"</div>"+progressBar+'</div><div class="task-pts">+'+t.pts+' $PTON</div></div>';
   }).join("");
 }
 
 function renderBoxes(){
   const el = document.getElementById("boxes-list");
   if(!el) return;
-  el.innerHTML = \`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">\` +
-  BOXES_DATA.map(b => \`
-    <div class="nft-card" style="background:\${b.bg||b.color};" onclick="openBox('\${b.id}')">
-      <span class="nft-emoji">\${b.emoji}</span>
-      <div class="nft-name">\${b.name}</div>
-      <div class="nft-rarity rar-\${b.rarity}">\${b.rarity.toUpperCase()}</div>
-      <div class="nft-price">\${b.price.toFixed(1)} TON</div>
-      <button class="nft-buy-btn">Open Box</button>
-    </div>\`).join("") + "</div>";
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">';
+  BOXES_DATA.forEach(function(b){
+    html += '<div class="nft-card" style="background:'+b.color+';" onclick="openBox(''+b.id+'')">';
+    html += '<span class="nft-emoji">'+b.emoji+'</span>';
+    html += '<div class="nft-name">'+b.name+'</div>';
+    html += '<div class="nft-rarity rar-'+b.rarity+'">'+b.rarity.toUpperCase()+'</div>';
+    html += '<div class="nft-price">'+b.price.toFixed(1)+' TON</div>';
+    html += '<button class="nft-buy-btn">Open Box</button>';
+    html += '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 function startMining(){
@@ -1163,18 +1158,21 @@ function renderNFTs(){
 
 function renderNFTCard(n, showOwned){
   const owned = ownedNFTs.includes(n.id);
+  const staked = stakedNFTs.includes(n.id);
+  const boost = NFT_BOOST[n.id];
   const rarClass = "rar-" + n.rarity;
-  return `
-  <div class="nft-card ${n.rarity}">
-    <span class="nft-emoji">${n.emoji}</span>
-    <div class="nft-name">${n.name}</div>
-    <div class="nft-rarity ${rarClass}">${n.rarity.toUpperCase()}</div>
-    <div class="nft-price">${owned?"Owned":n.price.toFixed(2)+" TON"}</div>
-    ${owned
-      ? "<button class='nft-buy-btn owned'>Active ✓</button>"
-      : "<button class='nft-buy-btn' data-id='" + n.id + "'>Buy " + n.price.toFixed(2) + " TON</button>"
-    }
-  </div>`;
+  const boostHtml = boost ? '<div style="font-size:10px;color:var(--green);margin-top:4px;">+'+boost.power+'% power · +'+boost.daily_energy+' energy/day</div>' : "";
+  let btnHtml = "";
+  if(owned){
+    const btnStyle = staked ? "background:linear-gradient(135deg,var(--gold),var(--gold3));color:#000;" : "";
+    const btnText = staked ? "⚡ Staked — Unstake" : "Stake for Boost";
+    btnHtml = '<button class="nft-buy-btn" onclick="stakeNFT(''+n.id+'')" style="'+btnStyle+'">'+btnText+'</button>';
+  } else {
+    btnHtml = '<button class="nft-buy-btn" data-id="'+n.id+'">Buy '+n.price.toFixed(2)+' TON</button>';
+  }
+  const cardClass = "nft-card " + n.rarity + (staked?" legendary":"");
+  const priceHtml = owned ? "Owned" : n.price.toFixed(2)+" TON";
+  return '<div class="'+cardClass+'"><span class="nft-emoji">'+n.emoji+'</span><div class="nft-name">'+n.name+'</div><div class="nft-rarity '+rarClass+'">'+n.rarity.toUpperCase()+'</div>'+boostHtml+'<div class="nft-price">'+priceHtml+'</div>'+btnHtml+'</div>';
 }
 
 function buyNFT(nft){
