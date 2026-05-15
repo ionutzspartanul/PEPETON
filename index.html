@@ -361,8 +361,8 @@ body{
           <div class="pkg-price">0.5 TON</div>
         </div>
         <div class="pkg-features">
-          <div class="pkg-feat">50 $PTON/hr mining rate</div>
-          <div class="pkg-feat">1,000 energy capacity</div>
+          <div class="pkg-feat">5 $PTON/hr mining rate</div>
+          <div class="pkg-feat">100 energy capacity</div>
           <div class="pkg-feat">Manual tap mining only</div>
           <div class="pkg-feat" style="color:#ff9944;">⚠ Mining stops when app is closed</div>
         </div>
@@ -378,8 +378,8 @@ body{
           <div class="pkg-price">1.5 TON</div>
         </div>
         <div class="pkg-features">
-          <div class="pkg-feat">200 $PTON/hr mining rate</div>
-          <div class="pkg-feat">3,000 energy capacity</div>
+          <div class="pkg-feat">20 $PTON/hr mining rate</div>
+          <div class="pkg-feat">300 energy capacity</div>
           <div class="pkg-feat" style="color:#39ff14;">✓ Mines 24/7 even when offline</div>
           <div class="pkg-feat">NFT marketplace access</div>
           <div class="pkg-feat">Priority earn rewards</div>
@@ -396,8 +396,8 @@ body{
           <div class="pkg-price">3.0 TON</div>
         </div>
         <div class="pkg-features">
-          <div class="pkg-feat">500 $PTON/hr mining rate</div>
-          <div class="pkg-feat">10,000 energy capacity</div>
+          <div class="pkg-feat">50 $PTON/hr mining rate</div>
+          <div class="pkg-feat">1,000 energy capacity</div>
           <div class="pkg-feat" style="color:#39ff14;">✓ Mines 24/7 offline + boost x2</div>
           <div class="pkg-feat">Exclusive Elite NFT drop</div>
           <div class="pkg-feat">P2P trading access</div>
@@ -504,7 +504,7 @@ body{
 
   <div class="price-display">
     <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">$PTON / TON</div>
-    <div class="price-main" id="p2p-price">0.00042</div>
+    <div class="price-main" id="p2p-price">0.000042</div>
     <div class="price-change" id="p2p-change">+12.4% today</div>
   </div>
 
@@ -603,8 +603,8 @@ const TC_KEY = "d983816713e7a20bef188837edc3f1696267b9a5513b1fa8f021d4c68380b857
 let walletAddr = localStorage.getItem("pton_wallet") || null;
 let ownedPackage = localStorage.getItem("pton_pkg") || null; // null/basic/pro/elite
 let ptonBalance = parseFloat(localStorage.getItem("pton_bal") || "0");
-let energy = parseInt(localStorage.getItem("pton_energy") || "1000");
-let maxEnergy = 1000;
+let energy = parseInt(localStorage.getItem("pton_energy") || "100");
+let maxEnergy = 100;
 let miningRate = 0;
 let ownedNFTs = JSON.parse(localStorage.getItem("pton_nfts") || "[]");
 let completedTasks = JSON.parse(localStorage.getItem("pton_tasks") || "[]");
@@ -614,9 +614,9 @@ let mineInterval = null;
 let payWalletOpened = false;
 
 const PKG_CONFIG = {
-  basic:  { rate: 50,   energy: 1000,  maxEnergy: 1000,  label: "Basic",  emoji: "⚡", offline: false },
-  pro:    { rate: 200,  energy: 3000,  maxEnergy: 3000,  label: "Pro",    emoji: "🔥", offline: true  },
-  elite:  { rate: 500,  energy: 10000, maxEnergy: 10000, label: "Elite",  emoji: "👑", offline: true  }
+  basic:  { rate: 5,    energy: 100,   maxEnergy: 100,   label: "Basic",  emoji: "⚡", offline: false },
+  pro:    { rate: 20,   energy: 300,   maxEnergy: 300,   label: "Pro",    emoji: "🔥", offline: true  },
+  elite:  { rate: 50,   energy: 1000,  maxEnergy: 1000,  label: "Elite",  emoji: "👑", offline: true  }
 };
 
 const NFTS_DATA = [
@@ -631,12 +631,12 @@ const NFTS_DATA = [
 ];
 
 const TASKS_DATA = [
-  { id:"telegram", label:"Join PEPETON Telegram channel", pts:500,    icon:"📢" },
-  { id:"twitter",  label:"Follow us on Twitter/X",        pts:300,    icon:"🐦" },
-  { id:"share",    label:"Share PEPETON with 3 friends",  pts:1000,   icon:"📤" },
-  { id:"wallet",   label:"Connect your TON wallet",       pts:200,    icon:"💳" },
-  { id:"first_pkg",label:"Purchase your first package",   pts:2000,   icon:"⛏" },
-  { id:"trade",    label:"Make your first P2P trade",     pts:500,    icon:"📈" },
+  { id:"telegram", label:"Join PEPETON Telegram channel", pts:5,    icon:"📢" },
+  { id:"twitter",  label:"Follow us on Twitter/X",        pts:3,    icon:"🐦" },
+  { id:"share",    label:"Share PEPETON with 3 friends",  pts:10,   icon:"📤" },
+  { id:"wallet",   label:"Connect your TON wallet",       pts:2,    icon:"💳" },
+  { id:"first_pkg",label:"Purchase your first package",   pts:20,   icon:"⛏" },
+  { id:"trade",    label:"Make your first P2P trade",     pts:5,    icon:"📈" },
 ];
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -771,7 +771,7 @@ function tapMine(e){
   if(energy <= 0){ toast("Energy depleted! Wait for regen.", "var(--red)"); return; }
 
   // Add tap bonus
-  const bonus = miningRate / 100;
+  const bonus = miningRate / 10000;
   ptonBalance += bonus;
   energy = Math.max(0, energy - 10);
   saveState();
@@ -974,7 +974,7 @@ function renderP2P(){
 
 function calcP2P(){
   const amt = parseFloat(document.getElementById("p2p-amount").value) || 0;
-  const price = 0.00042;
+  const price = 0.000042;
   const receive = p2pMode === "buy" ? (amt / price).toFixed(0) + " $PTON" : (amt * price).toFixed(4) + " TON";
   document.getElementById("p2p-receive").textContent = receive;
 }
@@ -995,7 +995,7 @@ function executeP2P(){
     const tkLink = "https://app.tonkeeper.com/transfer/" + OWNER +
       "?amount=" + nano + "&text=" + encodeURIComponent("PEPETON:P2P:BUY");
     showPayModal(amt, "Buy $PTON with " + amt + " TON", tkLink, function(){
-      const receive = amt / 0.00042;
+      const receive = amt / 0.000042;
       ptonBalance += receive;
       saveState();
       document.getElementById("pton-display").textContent = ptonBalance.toFixed(2);
@@ -1013,7 +1013,7 @@ function executeP2P(){
 // ── EARN ─────────────────────────────────────────────────────────────────────
 function openSpin(){
   if(!ownedPackage){ toast("Buy a mining package to spin!", "var(--gold2)"); return; }
-  const prizes = [100, 500, 1000, 250, 750, 2000, 50, 5000];
+  const prizes = [1, 5, 10, 2, 7, 20, 0.5, 50];
   const won = prizes[Math.floor(Math.random() * prizes.length)];
   ptonBalance += won;
   saveState();
@@ -1031,7 +1031,7 @@ function openLottery(){
     if(win){
       toast("JACKPOT! You won 50 TON! Payout within 24h.", "var(--gold3)");
     } else {
-      const consolation = Math.floor(Math.random() * 500) + 100;
+      const consolation = Math.floor(Math.random() * 5) + 1;
       ptonBalance += consolation;
       saveState();
       toast("Better luck next time! +"+consolation+" $PTON consolation prize.", "var(--gold2)");
@@ -1089,7 +1089,7 @@ function confirmWallet(){
   document.getElementById("wallet-modal").remove();
   if(!completedTasks.includes("wallet")){
     completedTasks.push("wallet");
-    ptonBalance += 200;
+    ptonBalance += 2;
     saveState();
   }
   toast("Wallet connected!", "var(--gold3)");
