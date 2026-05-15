@@ -537,7 +537,7 @@ body{
   <div class="ref-card">
     <div style="font-size:13px;font-weight:700;color:var(--gold2);margin-bottom:4px;">Your Referral Link</div>
     <div style="font-size:11px;color:var(--muted);">Earn 10% of your friends mining forever</div>
-    <div class="ref-link" id="ref-link" onclick="copyRefLink()">t.me/PepetonBot/Pepeton?startapp=ref_0</div>
+    <div class="ref-link" id="ref-link" onclick="copyRefLink()">t.me/OfficialPepetonBot/Pepeton?startapp=ref_0</div>
     <div class="ref-btns">
       <button class="ref-btn ref-btn-share" onclick="shareRefLink()">📤 Share Link</button>
       <button class="ref-btn ref-btn-copy" onclick="copyRefLink()">📋 Copy Link</button>
@@ -631,7 +631,7 @@ const NFTS_DATA = [
 ];
 
 const TASKS_DATA = [
-  { id:"telegram", label:"Join PEPETON Telegram channel", pts:5,    icon:"📢" },
+  { id:"telegram", label:"Join PEPETON Telegram channel", pts:5,    icon:"📢", url:"https://t.me/officialpepeton" },
   { id:"twitter",  label:"Follow us on Twitter/X",        pts:3,    icon:"🐦" },
   { id:"share",    label:"Share PEPETON with 3 friends",  pts:10,   icon:"📤" },
   { id:"wallet",   label:"Connect your TON wallet",       pts:2,    icon:"💳" },
@@ -872,6 +872,21 @@ function completeTask(id, pts){
     navTo(document.querySelectorAll(".nav-btn")[0], "mine");
     return;
   }
+  // Open URL for social tasks
+  const task = TASKS_DATA.find(t => t.id === id);
+  if(task && task.url){
+    if(tg && tg.openLink) tg.openLink(task.url);
+    else window.open(task.url, "_blank");
+  }
+  if(id === "share"){
+    const link = "https://t.me/OfficialPepetonBot/Pepeton?startapp=ref_" + UID;
+    if(tg) tg.openTelegramLink("https://t.me/share/url?url=" + encodeURIComponent(link));
+  }
+  if(id === "twitter"){
+    const url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("Mining $PTON on PEPETON! Join me: https://t.me/OfficialPepetonBot/Pepeton");
+    if(tg && tg.openLink) tg.openLink(url);
+    else window.open(url, "_blank");
+  }
   completedTasks.push(id);
   ptonBalance += pts;
   saveState();
@@ -1041,20 +1056,20 @@ function openLottery(){
 
 // ── FRIENDS ──────────────────────────────────────────────────────────────────
 function updateRefLink(){
-  const link = "t.me/PepetonBot/Pepeton?startapp=ref_" + UID;
+  const link = "t.me/OfficialPepetonBot/Pepeton?startapp=ref_" + UID;
   const el = document.getElementById("ref-link");
   if(el) el.textContent = link;
 }
 
 function shareRefLink(){
-  const link = "https://t.me/PepetonBot/Pepeton?startapp=ref_" + UID;
+  const link = "https://t.me/OfficialPepetonBot/Pepeton?startapp=ref_" + UID;
   const text = "Join PEPETON - The hottest TON mining app! Earn $PTON daily!";
   if(tg) tg.openTelegramLink("https://t.me/share/url?url=" + encodeURIComponent(link) + "&text=" + encodeURIComponent(text));
   else{ copyText(link); toast("Link copied!", "var(--gold2)"); }
 }
 
 function copyRefLink(){
-  copyText("https://t.me/PepetonBot/Pepeton?startapp=ref_" + UID);
+  copyText("https://t.me/OfficialPepetonBot/Pepeton?startapp=ref_" + UID);
   toast("Referral link copied!", "var(--gold2)");
 }
 
