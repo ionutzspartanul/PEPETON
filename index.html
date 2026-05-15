@@ -101,6 +101,9 @@ body{
 }
 .frog-container{position:relative;display:inline-block;cursor:pointer;user-select:none;}
 .frog{font-size:90px;line-height:1;animation:float 3s ease-in-out infinite;display:block;filter:drop-shadow(0 0 20px rgba(212,160,23,.4));}
+.frog.auto-mining{animation:float 1.5s ease-in-out infinite,mine-flash 2s ease-in-out infinite;}
+.auto-badge{display:none;background:linear-gradient(135deg,var(--gold),var(--gold3));color:#000;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;margin-top:8px;font-family:Rajdhani,sans-serif;}
+.auto-badge.show{display:inline-block;}
 .frog-ring{
   position:absolute;inset:-10px;border-radius:50%;
   border:2px solid rgba(212,160,23,.3);
@@ -327,8 +330,13 @@ body{
       <div class="frog-ring r2"></div>
       <span class="frog" id="frog-emoji">🐸</span>
     </div>
+    <div id="auto-badge" class="auto-badge">⚡ AUTO-MINING</div>
     <div class="pton-display" id="pton-display">0.00</div>
     <div class="pton-sub">$PTON MINED</div>
+    <div style="margin-top:10px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <div style="background:rgba(212,160,23,.1);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--gold2);" id="hashrate-display">0 $PTON/hr</div>
+      <div style="background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.2);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--green);" id="nft-boost-display">+0% NFT boost</div>
+    </div>
   </div>
 
   <div class="stats-row">
@@ -429,8 +437,16 @@ body{
   </div>
 
   <div style="padding:14px 16px 0;">
-    <div class="sec-title">Daily Tasks</div>
+    <div class="sec-title">Daily Tasks — Resets at midnight</div>
+    <div id="daily-tasks-list"></div>
+  </div>
+  <div style="padding:14px 16px 0;">
+    <div class="sec-title">One-Time Tasks</div>
     <div id="tasks-list"></div>
+  </div>
+  <div style="padding:14px 16px 0;">
+    <div class="sec-title">Mystery Boxes — Open for NFTs</div>
+    <div id="boxes-list"></div>
   </div>
 
   <div style="padding:14px 16px 0;">
@@ -602,7 +618,7 @@ const TC_KEY = "d983816713e7a20bef188837edc3f1696267b9a5513b1fa8f021d4c68380b857
 // ── STATE ────────────────────────────────────────────────────────────────────
 let walletAddr = localStorage.getItem("pton_wallet") || null;
 let ownedPackage = localStorage.getItem("pton_pkg") || null; // null/basic/pro/elite
-let ptonBalance = parseFloat(localStorage.getItem("pton_bal") || "0");
+let ptonBalance = localStorage.getItem("pton_pkg") ? parseFloat(localStorage.getItem("pton_bal") || "0") : 0;
 let energy = parseInt(localStorage.getItem("pton_energy") || "100");
 let maxEnergy = 100;
 let miningRate = 0;
@@ -612,6 +628,15 @@ let p2pMode = "buy";
 let nftTab = "drops";
 let mineInterval = null;
 let payWalletOpened = false;
+
+// Hashrate & staking system
+let baseHashrate = 0;
+let nftBoost = 0; // % boost from staked NFTs
+let stakedNFTs = JSON.parse(localStorage.getItem("pton_staked") || "[]");
+let dailyTasksDate = localStorage.getItem("pton_daily_date") || "";
+let dailyTasksDone = JSON.parse(localStorage.getItem("pton_daily_done") || "[]");
+let boxes = JSON.parse(localStorage.getItem("pton_boxes") || "[]");
+let totalHashrate = 0;
 
 const PKG_CONFIG = {
   basic:  { rate: 5,    energy: 100,   maxEnergy: 100,   label: "Basic",  emoji: "⚡", offline: false },
@@ -630,6 +655,31 @@ const NFTS_DATA = [
   { id:"gem",        name:"Green Gem",       emoji:"💚", rarity:"common",    price:2.0,  owned:false },
 ];
 
+const BOXES_DATA = [
+  { id:"ceramic",  name:"Ceramic Box",  emoji:"📦", price:0.1,  rarity:"common",   color:"#2a2200" },
+  { id:"silver",   name:"Silver Box",   emoji:"🎁", price:0.3,  rarity:"rare",     color:"#1a1a2a" },
+  { id:"golden",   name:"Golden Box",   emoji:"✨", price:0.8,  rarity:"epic",     color:"#2a1a00" },
+  { id:"diamond",  name:"Diamond Box",  emoji:"💎", price:2.0,  rarity:"legendary",color:"#0a1a2a" },
+];
+
+const NFT_BOOST = {
+  "gem":       { power: 5,  daily_energy: 10  },
+  "lightning": { power: 10, daily_energy: 20  },
+  "fire":      { power: 15, daily_energy: 30  },
+  "crown":     { power: 25, daily_energy: 50  },
+  "rocket":    { power: 35, daily_energy: 80  },
+  "diamond":   { power: 50, daily_energy: 120 },
+  "gold_frog": { power: 75, daily_energy: 200 },
+  "pepe_og":   { power: 100,daily_energy: 300 },
+};
+
+const DAILY_TASKS = [
+  { id:"d_tap",    label:"Tap 50 times today",          pts:2,  icon:"👆", target:50  },
+  { id:"d_energy", label:"Use all your energy today",   pts:3,  icon:"⚡", target:1   },
+  { id:"d_open",   label:"Open app 3 times today",      pts:1,  icon:"📱", target:3   },
+  { id:"d_share",  label:"Share PEPETON today",         pts:5,  icon:"📤", target:1   },
+];
+
 const TASKS_DATA = [
   { id:"telegram", label:"Join PEPETON Telegram channel", pts:5,    icon:"📢", url:"https://t.me/officialpepeton" },
   { id:"twitter",  label:"Follow us on Twitter/X",        pts:3,    icon:"🐦" },
@@ -641,12 +691,14 @@ const TASKS_DATA = [
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 function init(){
-  if(walletAddr){
-    document.getElementById("pton_wallet") && null;
-  }
+  checkDailyReset();
+  trackOpen();
+  calcHashrate();
   updateMineUI();
   renderTasks();
+  renderDailyTasks();
   renderNFTs();
+  renderBoxes();
   renderP2P();
   startMining();
   updateRefLink();
@@ -662,7 +714,7 @@ function updateMineUI(){
     frogTap.style.opacity = "0.3";
     document.getElementById("stat-pkg").textContent = "None";
     document.getElementById("stat-rate").textContent = "0";
-    energy = 1000; maxEnergy = 1000; miningRate = 0;
+    energy = 100; maxEnergy = 100; miningRate = 0;
   } else {
     locked.style.display = "none";
     frogTap.style.opacity = "1";
@@ -671,6 +723,16 @@ function updateMineUI(){
     miningRate = cfg.rate;
     document.getElementById("stat-pkg").textContent = cfg.emoji + " " + cfg.label;
     document.getElementById("stat-rate").textContent = cfg.rate.toLocaleString();
+    // Show auto-mining badge for Pro/Elite
+    const badge = document.getElementById("auto-badge");
+    const frog = document.getElementById("frog-emoji");
+    if(cfg.offline){
+      badge.classList.add("show");
+      frog.classList.add("auto-mining");
+    } else {
+      badge.classList.remove("show");
+      frog.classList.remove("auto-mining");
+    }
     // Update owned buttons
     ["basic","pro","elite"].forEach(p => {
       const btn = document.getElementById("btn-" + p);
@@ -687,6 +749,166 @@ function updateMineUI(){
   updateEnergyBar();
   document.getElementById("pton-display").textContent = ptonBalance.toFixed(2);
   document.getElementById("pton-hdr").textContent = Math.floor(ptonBalance).toLocaleString();
+}
+
+function calcHashrate(){
+  if(!ownedPackage) return 0;
+  const cfg = PKG_CONFIG[ownedPackage];
+  baseHashrate = cfg.rate;
+  // Add NFT boost
+  nftBoost = 0;
+  stakedNFTs.forEach(nftId => {
+    const boost = NFT_BOOST[nftId];
+    if(boost) nftBoost += boost.power;
+  });
+  totalHashrate = Math.floor(baseHashrate * (1 + nftBoost/100));
+  miningRate = totalHashrate;
+  document.getElementById("stat-rate").textContent = totalHashrate.toLocaleString();
+  // Update hashrate display if exists
+  const hrEl = document.getElementById("hashrate-display");
+  if(hrEl) hrEl.textContent = totalHashrate.toLocaleString() + " $PTON/hr";
+  const boostEl = document.getElementById("nft-boost-display");
+  if(boostEl) boostEl.textContent = "+" + nftBoost + "% NFT boost";
+  return totalHashrate;
+}
+
+function getDailyEnergyBonus(){
+  let bonus = 0;
+  stakedNFTs.forEach(nftId => {
+    const boost = NFT_BOOST[nftId];
+    if(boost) bonus += boost.daily_energy;
+  });
+  return bonus;
+}
+
+function stakeNFT(nftId){
+  if(!ownedNFTs.includes(nftId)){ toast("You don't own this NFT!", "var(--red)"); return; }
+  if(stakedNFTs.includes(nftId)){
+    // Unstake
+    stakedNFTs = stakedNFTs.filter(n => n !== nftId);
+    toast("NFT unstaked!", "var(--muted)");
+  } else {
+    stakedNFTs.push(nftId);
+    toast("NFT staked! Hashrate boosted!", "var(--gold3)");
+  }
+  localStorage.setItem("pton_staked", JSON.stringify(stakedNFTs));
+  calcHashrate();
+  renderNFTs();
+}
+
+function openBox(boxId){
+  if(!walletAddr){ toast("Connect wallet first!", "var(--gold2)"); connectWalletFlow(); return; }
+  const box = BOXES_DATA.find(b => b.id === boxId);
+  if(!box) return;
+  const nano = Math.floor(box.price * 1e9);
+  const tkLink = "https://app.tonkeeper.com/transfer/" + OWNER +
+    "?amount=" + nano + "&text=" + encodeURIComponent("PEPETON:BOX:" + boxId);
+  showPayModal(box.price, box.emoji + " " + box.name, tkLink, function(){
+    // Random NFT based on box rarity
+    const pools = {
+      ceramic:  ["gem","lightning"],
+      silver:   ["gem","lightning","fire","crown"],
+      golden:   ["fire","crown","rocket","diamond"],
+      diamond:  ["rocket","diamond","gold_frog","pepe_og"]
+    };
+    const pool = pools[boxId] || ["gem"];
+    const won = pool[Math.floor(Math.random() * pool.length)];
+    const nft = NFTS_DATA.find(n => n.id === won);
+    if(!ownedNFTs.includes(won)){
+      ownedNFTs.push(won);
+      saveState();
+    }
+    toast("You got: " + (nft ? nft.emoji + " " + nft.name : won) + "!", "var(--gold3)");
+    renderNFTs();
+    calcHashrate();
+  }, null);
+}
+
+function checkDailyReset(){
+  const today = new Date().toDateString();
+  if(dailyTasksDate !== today){
+    dailyTasksDate = today;
+    dailyTasksDone = [];
+    // Add daily energy bonus from staked NFTs
+    const bonus = getDailyEnergyBonus();
+    if(bonus > 0 && ownedPackage){
+      const cfg = PKG_CONFIG[ownedPackage];
+      energy = Math.min(cfg.maxEnergy, energy + bonus);
+      saveState();
+      toast("Daily reset! +" + bonus + " energy from staked NFTs!", "var(--gold3)");
+    }
+    localStorage.setItem("pton_daily_date", today);
+    localStorage.setItem("pton_daily_done", JSON.stringify([]));
+  }
+}
+
+let tapCount = parseInt(localStorage.getItem("pton_taps_today") || "0");
+let openCount = parseInt(localStorage.getItem("pton_opens_today") || "0");
+
+function trackOpen(){
+  const today = new Date().toDateString();
+  const lastOpen = localStorage.getItem("pton_open_date") || "";
+  if(lastOpen !== today){
+    openCount = 0;
+    localStorage.setItem("pton_open_date", today);
+    tapCount = 0;
+    localStorage.setItem("pton_taps_today", "0");
+  }
+  openCount++;
+  localStorage.setItem("pton_opens_today", openCount);
+  checkDailyTaskProgress("d_open", openCount, 3);
+}
+
+function checkDailyTaskProgress(id, current, target){
+  if(dailyTasksDone.includes(id)) return;
+  if(current >= target){
+    dailyTasksDone.push(id);
+    localStorage.setItem("pton_daily_done", JSON.stringify(dailyTasksDone));
+    const task = DAILY_TASKS.find(t => t.id === id);
+    if(task){
+      ptonBalance += task.pts;
+      saveState();
+      toast("Daily task done! +" + task.pts + " $PTON!", "var(--gold3)");
+    }
+  }
+}
+
+function renderDailyTasks(){
+  const el = document.getElementById("daily-tasks-list");
+  if(!el) return;
+  checkDailyReset();
+  el.innerHTML = DAILY_TASKS.map(t => {
+    const done = dailyTasksDone.includes(t.id);
+    let progress = 0;
+    if(t.id === "d_tap") progress = Math.min(tapCount, t.target);
+    if(t.id === "d_open") progress = Math.min(openCount, t.target);
+    if(t.id === "d_energy") progress = energy <= 0 ? 1 : 0;
+    const pct = t.target > 1 ? Math.round(progress/t.target*100) : (done?100:0);
+    return \`
+    <div class="task-card \${done?"done":""}">
+      <div class="task-check">\${done?"✓":""}</div>
+      <div style="font-size:20px;flex-shrink:0;">\${t.icon}</div>
+      <div class="task-label" style="flex:1;">
+        <div>\${t.label}</div>
+        \${t.target > 1 ? \`<div style="margin-top:4px;"><div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:\${pct}%;background:var(--gold);border-radius:2px;"></div></div></div>\` : ""}
+      </div>
+      <div class="task-pts">+\${t.pts} $PTON</div>
+    </div>\`;
+  }).join("");
+}
+
+function renderBoxes(){
+  const el = document.getElementById("boxes-list");
+  if(!el) return;
+  el.innerHTML = \`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">\` +
+  BOXES_DATA.map(b => \`
+    <div class="nft-card" style="background:\${b.bg||b.color};" onclick="openBox('\${b.id}')">
+      <span class="nft-emoji">\${b.emoji}</span>
+      <div class="nft-name">\${b.name}</div>
+      <div class="nft-rarity rar-\${b.rarity}">\${b.rarity.toUpperCase()}</div>
+      <div class="nft-price">\${b.price.toFixed(1)} TON</div>
+      <button class="nft-buy-btn">Open Box</button>
+    </div>\`).join("") + "</div>";
 }
 
 function startMining(){
@@ -756,6 +978,8 @@ function startMining(){
     document.getElementById("pton-display").textContent = ptonBalance.toFixed(2);
     document.getElementById("pton-hdr").textContent = Math.floor(ptonBalance).toLocaleString();
     updateEnergyBar();
+    // Check energy daily task
+    if(energy <= 0) checkDailyTaskProgress("d_energy", 1, 1);
   }, 1000);
 }
 
@@ -790,6 +1014,11 @@ function tapMine(e){
     el.style.opacity = Math.max(0, 1 + y/50);
     if(y < -60){ clearInterval(anim); el.remove(); }
   }, 16);
+
+  // Track daily tap count
+  tapCount++;
+  localStorage.setItem("pton_taps_today", tapCount);
+  checkDailyTaskProgress("d_tap", tapCount, 50);
 
   // Frog bounce
   const frog = document.getElementById("frog-emoji");
@@ -830,6 +1059,11 @@ function buyPackage(pkg, price){
     energy = cfg.maxEnergy;
     maxEnergy = cfg.maxEnergy;
     miningRate = cfg.rate;
+    // Reset balance to 0 on first purchase - no free PTON
+    if(!localStorage.getItem("pton_pkg")){
+      ptonBalance = 0;
+      localStorage.setItem("pton_last_seen", Math.floor(Date.now()/1000));
+    }
     localStorage.setItem("pton_pkg", pkg);
     saveState();
     updateMineUI();
@@ -1178,6 +1412,8 @@ function navTo(btn, name){
   document.getElementById("screen-" + name).classList.add("active");
   if(btn) btn.classList.add("active");
   window.scrollTo(0, 0);
+  if(name === "earn"){ renderDailyTasks(); renderTasks(); renderBoxes(); }
+  if(name === "nft") renderNFTs();
 }
 
 // ── TOAST ────────────────────────────────────────────────────────────────────
