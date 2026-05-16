@@ -1176,23 +1176,28 @@ function renderNFTCard(n, showOwned){
   var staked = stakedNFTs.includes(n.id);
   var boost = NFT_BOOST[n.id];
   var rarClass = "rar-" + n.rarity;
-  var boostHtml = "";
-  if(boost){
-    boostHtml = "<div style='font-size:10px;color:#39ff14;margin-top:4px;'>+" + boost.power + "% power, +" + boost.daily_energy + " energy/day</div>";
-  }
+  var boostHtml = boost ? "<div style=\"font-size:10px;color:#39ff14;margin-top:4px\">+" + boost.power + "% power, +" + boost.daily_energy + " energy/day</div>" : "";
   var btnHtml = "";
   if(owned){
     if(staked){
-      btnHtml = "<button class='nft-buy-btn' style='background:linear-gradient(135deg,#d4a017,#ffd700);color:#000;' data-stake='" + n.id + "'>Staked - Unstake</button>";
+      btnHtml = "<button class=\"nft-buy-btn\" style=\"background:linear-gradient(135deg,#d4a017,#ffd700);color:#000\" data-stake=\"" + n.id + "\">Staked - Unstake</button>";
     } else {
-      btnHtml = "<button class='nft-buy-btn' data-stake='" + n.id + "'>Stake for Boost</button>";
+      btnHtml = "<button class=\"nft-buy-btn\" data-stake=\"" + n.id + "\">Stake for Boost</button>";
     }
   } else {
-    btnHtml = "<button class='nft-buy-btn' data-id='" + n.id + "'>Buy " + n.price.toFixed(2) + " TON</button>";
+    btnHtml = "<button class=\"nft-buy-btn\" data-id=\"" + n.id + "\">Buy " + n.price.toFixed(2) + " TON</button>";
   }
   var cardClass = "nft-card " + n.rarity + (staked ? " legendary" : "");
   var priceHtml = owned ? "Owned" : n.price.toFixed(2) + " TON";
-  return "<div class='" + cardClass + "'><span class='nft-emoji'>" + n.emoji + "</span><div class='nft-name'>" + n.name + "</div><div class='nft-rarity " + rarClass + "'>" + n.rarity.toUpperCase() + "</div>" + boostHtml + "<div class='nft-price'>" + priceHtml + "</div>" + btnHtml + "</div>";
+  var html = "<div class=\"" + cardClass + "\">";
+  html += "<span class=\"nft-emoji\">" + n.emoji + "</span>";
+  html += "<div class=\"nft-name\">" + n.name + "</div>";
+  html += "<div class=\"nft-rarity " + rarClass + "\">" + n.rarity.toUpperCase() + "</div>";
+  html += boostHtml;
+  html += "<div class=\"nft-price\">" + priceHtml + "</div>";
+  html += btnHtml;
+  html += "</div>";
+  return html;
 }
 function buyNFT(nft){
   if(!walletAddr){ toast("Connect wallet first!", "var(--gold2)"); connectWalletFlow(); return; }
