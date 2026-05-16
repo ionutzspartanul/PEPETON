@@ -452,7 +452,7 @@ body{
   <div style="padding:14px 16px 0;">
     <div class="sec-title">Special Rewards</div>
     <div class="earn-grid" style="padding:0;">
-      <div class="earn-card" onclick="openSpin()">
+      <div class="earn-card" id="spin-card" onclick="openSpin()">
         <div class="earn-icon">🎡</div>
         <div class="earn-info">
           <div class="earn-title">Wheel of Fortune</div>
@@ -709,29 +709,37 @@ function updateMineUI(){
   const locked = document.getElementById("locked-overlay");
   const frogTap = document.getElementById("frog-tap");
 
+  var frogEl = document.getElementById("frog-emoji");
   if(!ownedPackage){
     locked.style.display = "flex";
     frogTap.style.opacity = "0.3";
+    if(frogEl) frogEl.textContent = "🐸";
     document.getElementById("stat-pkg").textContent = "None";
     document.getElementById("stat-rate").textContent = "0";
     energy = 100; maxEnergy = 100; miningRate = 0;
   } else {
     locked.style.display = "none";
     frogTap.style.opacity = "1";
-    const cfg = PKG_CONFIG[ownedPackage];
+    var cfg = PKG_CONFIG[ownedPackage];
     maxEnergy = cfg.maxEnergy;
     miningRate = cfg.rate;
     document.getElementById("stat-pkg").textContent = cfg.emoji + " " + cfg.label;
     document.getElementById("stat-rate").textContent = cfg.rate.toLocaleString();
+    // Set frog emoji based on package - eyes on fire!
+    if(frogEl){
+      if(ownedPackage === "elite") frogEl.textContent = "🤩";
+      else if(ownedPackage === "pro") frogEl.textContent = "😤";
+      else frogEl.textContent = "😊";
+    }
     // Show auto-mining badge for Pro/Elite
-    const badge = document.getElementById("auto-badge");
-    const frog = document.getElementById("frog-emoji");
+    var badge = document.getElementById("auto-badge");
+    var frog = document.getElementById("frog-emoji");
     if(cfg.offline){
-      badge.classList.add("show");
-      frog.classList.add("auto-mining");
+      if(badge) badge.classList.add("show");
+      if(frog) frog.classList.add("auto-mining");
     } else {
-      badge.classList.remove("show");
-      frog.classList.remove("auto-mining");
+      if(badge) badge.classList.remove("show");
+      if(frog) frog.classList.remove("auto-mining");
     }
     // Update owned buttons
     ["basic","pro","elite"].forEach(p => {
@@ -877,16 +885,53 @@ function renderDailyTasks(){
   const el = document.getElementById("daily-tasks-list");
   if(!el) return;
   checkDailyReset();
-  el.innerHTML = DAILY_TASKS.map(function(t){
-    const done = dailyTasksDone.includes(t.id);
-    let progress = 0;
+  var html = "";
+  for(var i=0;i<DAILY_TASKS.length;i++){
+    var t = DAILY_TASKS[i];
+    var done = dailyTasksDone.includes(t.id);
+    var progress = 0;
     if(t.id === "d_tap") progress = Math.min(tapCount, t.target);
     if(t.id === "d_open") progress = Math.min(openCount, t.target);
     if(t.id === "d_energy") progress = energy <= 0 ? 1 : 0;
-    const pct = t.target > 1 ? Math.round(progress/t.target*100) : (done?100:0);
-    const progressBar = t.target > 1 ? '<div style="margin-top:4px;"><div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--gold);border-radius:2px;"></div></div></div>' : "";
-    return '<div class="task-card '+(done?"done":"")+'"><div class="task-check">'+(done?"✓":"")+'</div><div style="font-size:20px;flex-shrink:0;">'+t.icon+'</div><div class="task-label" style="flex:1;"><div>'+t.label+"</div>"+progressBar+'</div><div class="task-pts">+'+t.pts+' $PTON</div></div>';
-  }).join("");
+    var pct = t.target > 1 ? Math.round(progress/t.target*100) : (done?100:0);
+    var bar = t.target > 1 ? "<div style=\"margin-top:4px;\"><div style=\"height:3px;background:var(--border);border-radius:2px;overflow:hidden;\"><div style=\"height:100%;width:" + pct + "%;background:var(--gold);border-radius:2px;\"></div></div></div>" : "";
+    html += "<div class=\"task-card " + (done?"done":"") + "\" data-task=\"" + t.id + "\" data-pts=\"" + t.pts + "\">";
+    html += "<div class=\"task-check\">" + (done?"✓":"") + "</div>";
+    html += "<div style=\"font-size:20px;flex-shrink:0;\">" + t.icon + "</div>";
+    html += "<div class=\"task-label\" style=\"flex:1;\"><div>" + t.label + "</div>" + bar + "</div>";
+    html += "<div class=\"task-pts\">+" + t.pts + " $PTON</div>";
+    html += "</div>";
+  }
+  el.innerHTML = html;
+  // Attach click events
+  var cards = el.querySelectorAll("[data-task]");
+  for(var j=0;j<cards.length;j++){
+    cards[j].addEventListener("click", function(){
+      var id = this.getAttribute("data-task");
+      var pts = parseInt(this.getAttribute("data-pts"));
+      completeDailyTask(id, pts);
+    });
+  }
+}
+
+function completeDailyTask(id, pts){
+  if(dailyTasksDone.includes(id)){ toast("Already done today!", "var(--muted)"); return; }
+  if(id === "d_tap" && tapCount < 50){ toast("Tap " + (50-tapCount) + " more times!", "var(--gold2)"); return; }
+  if(id === "d_energy" && energy > 0){ toast("Use all your energy first!", "var(--gold2)"); return; }
+  if(id === "d_open" && openCount < 3){ toast("Open app " + (3-openCount) + " more times today!", "var(--gold2)"); return; }
+  if(id === "d_share"){
+    var link = "https://t.me/OfficialPepetonBot/Pepeton?startapp=ref_" + UID;
+    if(tg) tg.openTelegramLink("https://t.me/share/url?url=" + encodeURIComponent(link));
+    else window.open(link, "_blank");
+  }
+  dailyTasksDone.push(id);
+  localStorage.setItem("pton_daily_done", JSON.stringify(dailyTasksDone));
+  ptonBalance += pts;
+  saveState();
+  document.getElementById("pton-display").textContent = ptonBalance.toFixed(2);
+  document.getElementById("pton-hdr").textContent = Math.floor(ptonBalance).toLocaleString();
+  renderDailyTasks();
+  toast("+" + pts + " $PTON earned!", "var(--gold3)");
 }
 
 function renderBoxes(){
@@ -1151,24 +1196,21 @@ function renderNFTs(){
     return;
   }
   el.innerHTML = "<div class='nft-grid'>" + NFTS_DATA.map(n => renderNFTCard(n, false)).join("") + "</div>";
-  // Attach buy events
-  var buyBtns = el.querySelectorAll("[data-id]");
-  for(var i=0;i<buyBtns.length;i++){
-    buyBtns[i].addEventListener("click", function(){
-      var id = this.getAttribute("data-id");
+  // Attach all button events via delegation on grid
+  el.onclick = function(e){
+    var btn = e.target.closest("button");
+    if(!btn) return;
+    e.stopPropagation();
+    var id = btn.getAttribute("data-id");
+    var stakeId = btn.getAttribute("data-stake");
+    if(id){
       var nft = null;
       for(var j=0;j<NFTS_DATA.length;j++){ if(NFTS_DATA[j].id===id){ nft=NFTS_DATA[j]; break; } }
       if(nft) buyNFT(nft);
-    });
-  }
-  // Attach stake events
-  var stakeBtns = el.querySelectorAll("[data-stake]");
-  for(var k=0;k<stakeBtns.length;k++){
-    stakeBtns[k].addEventListener("click", function(e){
-      e.stopPropagation();
-      stakeNFT(this.getAttribute("data-stake"));
-    });
-  }
+    } else if(stakeId){
+      stakeNFT(stakeId);
+    }
+  };
 }
 
 function renderNFTCard(n, showOwned){
@@ -1282,14 +1324,43 @@ function executeP2P(){
 }
 
 // ── EARN ─────────────────────────────────────────────────────────────────────
+function getSpinLimit(){
+  if(!ownedPackage) return 0;
+  return {basic:1, pro:3, elite:5}[ownedPackage] || 1;
+}
+
 function openSpin(){
   if(!ownedPackage){ toast("Buy a mining package to spin!", "var(--gold2)"); return; }
-  const prizes = [1, 5, 10, 2, 7, 20, 0.5, 50];
-  const won = prizes[Math.floor(Math.random() * prizes.length)];
+  
+  // Check daily spin limit
+  var today = new Date().toDateString();
+  var spinDate = localStorage.getItem("pton_spin_date") || "";
+  var spinCount = parseInt(localStorage.getItem("pton_spin_count") || "0");
+  
+  if(spinDate !== today){
+    spinCount = 0;
+    localStorage.setItem("pton_spin_date", today);
+    localStorage.setItem("pton_spin_count", "0");
+  }
+  
+  var limit = getSpinLimit();
+  if(spinCount >= limit){
+    toast("No spins left today! " + limit + "/" + limit + " used. Resets at midnight.", "var(--red)");
+    return;
+  }
+  
+  spinCount++;
+  localStorage.setItem("pton_spin_count", spinCount);
+  
+  var prizes = [0.5, 1, 2, 5, 7, 10, 20, 50];
+  var won = prizes[Math.floor(Math.random() * prizes.length)];
   ptonBalance += won;
   saveState();
   document.getElementById("pton-display").textContent = ptonBalance.toFixed(2);
-  toast("You won " + won.toLocaleString() + " $PTON!", "var(--gold3)");
+  document.getElementById("pton-hdr").textContent = Math.floor(ptonBalance).toLocaleString();
+  
+  var left = limit - spinCount;
+  toast("Won " + won + " $PTON! (" + left + " spins left today)", "var(--gold3)");
 }
 
 function openLottery(){
