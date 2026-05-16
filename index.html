@@ -890,20 +890,28 @@ function renderDailyTasks(){
 }
 
 function renderBoxes(){
-  const el = document.getElementById("boxes-list");
+  var el = document.getElementById("boxes-list");
   if(!el) return;
-  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">';
-  BOXES_DATA.forEach(function(b){
-    html += '<div class="nft-card" style="background:'+b.color+';" onclick="openBox(''+b.id+'')">';
-    html += '<span class="nft-emoji">'+b.emoji+'</span>';
-    html += '<div class="nft-name">'+b.name+'</div>';
-    html += '<div class="nft-rarity rar-'+b.rarity+'">'+b.rarity.toUpperCase()+'</div>';
-    html += '<div class="nft-price">'+b.price.toFixed(1)+' TON</div>';
-    html += '<button class="nft-buy-btn">Open Box</button>';
-    html += '</div>';
-  });
-  html += '</div>';
+  var html = "";
+  html += "<div style='display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;'>";
+  for(var i=0;i<BOXES_DATA.length;i++){
+    var b = BOXES_DATA[i];
+    html += "<div class='nft-card box-card' data-box='" + b.id + "' style='background:" + b.color + ";cursor:pointer;'>";
+    html += "<span class='nft-emoji'>" + b.emoji + "</span>";
+    html += "<div class='nft-name'>" + b.name + "</div>";
+    html += "<div class='nft-rarity rar-" + b.rarity + "'>" + b.rarity.toUpperCase() + "</div>";
+    html += "<div class='nft-price'>" + b.price.toFixed(1) + " TON</div>";
+    html += "<button class='nft-buy-btn'>Open Box</button>";
+    html += "</div>";
+  }
+  html += "</div>";
   el.innerHTML = html;
+  // Attach events via JS not inline onclick
+  el.querySelectorAll(".box-card").forEach(function(card){
+    card.addEventListener("click", function(){
+      openBox(this.getAttribute("data-box"));
+    });
+  });
 }
 
 function startMining(){
