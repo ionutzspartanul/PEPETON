@@ -690,6 +690,70 @@ if(tg){ tg.ready(); tg.expand(); }
 const UID = tg?.initDataUnsafe?.user?.id || 0;
 const UNAME = tg?.initDataUnsafe?.user?.username || "player";
 const OWNER = "UQCvimmPAInaVHWUGPMfLu06m7k62bZ27_Asyob6w9_N7Ykw";
+const BIN_URL = "https://api.jsonbin.io/v3/b/6a089cad250b1311c35d359c";
+const BIN_KEY = "$2a$10$SqxCmCPhdCy9kfB2h4noQu.PKuVxS1upx/gWGK6IU8mGoxRNM79eS";
+
+// NFT Max Supply
+const NFT_SUPPLY = {
+  eco_pepe:    10000,
+  aqua_pepe:   10000,
+  dune_pepe:   5000,
+  blaze_pepe:  5000,
+  pepe_volt:   2000,
+  cosmos_pepe: 2000,
+  cyber_pepe:  1000,
+  void_pepe:   500
+};
+
+let nftStock = {}; // loaded from JSONBin
+
+async function loadStock(){
+  try{
+    var r = await fetch(BIN_URL + "/latest", {
+      headers: {"X-Master-Key": BIN_KEY, "X-Bin-Meta": "false"}
+    });
+    var data = await r.json();
+    nftStock = data;
+    console.log("Stock loaded:", nftStock);
+    // Re-render NFTs if on NFT screen
+    if(document.getElementById("screen-nft").classList.contains("active")){
+      renderNFTs();
+    }
+  }catch(e){
+    console.log("Stock load error:", e);
+    // Fallback to max supply
+    nftStock = Object.assign({}, NFT_SUPPLY);
+  }
+}
+
+async function decreaseStock(nftId){
+  if(!nftStock[nftId] || nftStock[nftId] <= 0) return false;
+  nftStock[nftId]--;
+  try{
+    await fetch(BIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": BIN_KEY
+      },
+      body: JSON.stringify(nftStock)
+    });
+    return true;
+  }catch(e){
+    console.log("Stock update error:", e);
+    return true; // Allow purchase even if update fails
+  }
+}
+
+function getStockDisplay(nftId){
+  var stock = nftStock[nftId];
+  var max = NFT_SUPPLY[nftId] || 0;
+  if(stock === undefined) return "";
+  if(stock <= 0) return "SOLD OUT";
+  var pct = stock / max;
+  var color = pct > 0.5 ? "#39ff14" : pct > 0.2 ? "#f0c040" : "#ff3333";
+  return '<span style="color:' + color + ';font-size:10px;font-weight:700;">' + stock.toLocaleString() + ' / ' + max.toLocaleString() + ' remaining</span>';
+}
 const TC_KEY = "d983816713e7a20bef188837edc3f1696267b9a5513b1fa8f021d4c68380b857";
 
 // ── STATE ────────────────────────────────────────────────────────────────────
@@ -780,6 +844,8 @@ const TASKS_DATA = [
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 function init(){
+  // Load NFT stock from JSONBin
+  loadStock();
   // Version check - clear old inflated balances
   var appVer = localStorage.getItem("pton_ver");
   if(appVer !== "2"){
@@ -1421,11 +1487,17 @@ function renderNFTCard(n, showOwned){
   var mediaHtml = imgSrc
     ? "<img src=\"" + imgSrc + "\" style=\"width:80px;height:80px;object-fit:contain;margin-bottom:6px;filter:drop-shadow(0 0 8px rgba(212,160,23,.4));\"/>"
     : "<span class=\"nft-emoji\">" + (n.emoji||"🐸") + "</span>";
+  var stockHtml = getStockDisplay(n.id);
+  var soldOut = nftStock[n.id] !== undefined && nftStock[n.id] <= 0;
+  if(soldOut && !owned){
+    btnHtml = "<button class=\"nft-buy-btn\" style=\"background:#1a0000;color:#ff3333;border:1px solid #ff333333;\" disabled>SOLD OUT</button>";
+  }
   var html = "<div class=\"" + cardClass + "\">";
   html += mediaHtml;
   html += "<div class=\"nft-name\">" + n.name + "</div>";
   html += "<div class=\"nft-rarity " + rarClass + "\">" + n.rarity.toUpperCase() + "</div>";
   html += boostHtml;
+  html += stockHtml ? "<div style=\"margin-top:4px;\">" + stockHtml + "</div>" : "";
   html += "<div class=\"nft-price\">" + priceHtml + "</div>";
   html += btnHtml;
   html += "</div>";
@@ -1753,7 +1825,7 @@ function navTo(btn, name){
   if(btn) btn.classList.add("active");
   window.scrollTo(0, 0);
   if(name === "earn"){ renderDailyTasks(); renderTasks(); renderBoxes(); }
-  if(name === "nft") renderNFTs();
+  if(name === "nft"){ loadStock().then(renderNFTs); }
 }
 
 // ── TOAST ────────────────────────────────────────────────────────────────────
