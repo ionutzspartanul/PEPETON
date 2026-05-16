@@ -343,6 +343,29 @@ body{
     </div>
   </div>
 
+  <!-- AIRDROP BANNER -->
+  <div style="margin:12px 16px 0;background:linear-gradient(135deg,#0a0a00,#1a1500,#0a0a00);border-radius:16px;padding:14px;border:1px solid rgba(212,160,23,.4);position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,160,23,.08) 0%,transparent 70%);"></div>
+    <div style="position:relative;z-index:1;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:22px;">🪂</span>
+        <div>
+          <div style="font-size:14px;font-weight:900;color:var(--gold2);font-family:Cinzel Decorative,serif;">AIRDROP CONFIRMED</div>
+          <div style="font-size:11px;color:var(--muted);">$PTON Token Official Launch</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:10px;color:var(--muted);">Launch in</div>
+          <div style="font-size:13px;font-weight:800;color:var(--gold3);" id="launch-countdown">--d --h</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--gold2);">✓ 1:1 ratio</div>
+        <div style="background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.15);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--green);">✓ No sell limits after launch</div>
+        <div style="background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--gold2);">✓ Mine now = earn more</div>
+      </div>
+    </div>
+  </div>
+
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-val" id="stat-rate">0</div>
@@ -438,6 +461,17 @@ body{
   <div class="hdr">
     <div class="hdr-logo">PEPE<span>TON</span></div>
     <div class="ton-badge">💰 Earn $PTON</div>
+  </div>
+
+  <!-- AIRDROP INFO BOX -->
+  <div style="margin:14px 16px 0;background:linear-gradient(135deg,#0a0500,#1a1000);border-radius:14px;padding:14px;border:1px solid rgba(212,160,23,.3);">
+    <div style="font-size:13px;font-weight:800;color:var(--gold2);margin-bottom:8px;">🪂 How Airdrop Works</div>
+    <div style="display:flex;flex-direction:column;gap:5px;">
+      <div style="font-size:12px;color:var(--text);">⛏ Mine $PTON now in the app</div>
+      <div style="font-size:12px;color:var(--text);">📅 Official token launches in <span id="earn-launch-cd" style="color:var(--gold3);font-weight:700;">3 months</span></div>
+      <div style="font-size:12px;color:var(--text);">🎁 Every $PTON you mine = 1 real $PTON token</div>
+      <div style="font-size:12px;color:var(--green);">✅ No sell limits after official launch</div>
+    </div>
   </div>
 
   <div style="padding:14px 16px 0;">
@@ -598,6 +632,22 @@ body{
       <div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">No friends yet. Share your link!</div>
     </div>
   </div>
+  <!-- WITHDRAWAL SECTION -->
+  <div style="margin:14px 16px;background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border);">
+    <div style="font-size:14px;font-weight:700;color:var(--gold2);margin-bottom:4px;">💸 Withdraw TON</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Minimum withdrawal: 1 TON · Token launch coming soon</div>
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">TON Amount</div>
+    <input id="withdraw-amount" type="number" min="1" step="0.1" placeholder="Min 1.0 TON"
+      style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:15px;font-weight:700;outline:none;margin-bottom:10px;font-family:Rajdhani,sans-serif;"/>
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Your TON Wallet</div>
+    <input id="withdraw-wallet" type="text" placeholder="UQ... or EQ... address"
+      style="width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:12px;font-family:monospace;outline:none;margin-bottom:12px;"/>
+    <button onclick="requestWithdraw()"
+      style="width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:800;background:linear-gradient(135deg,#1a1200,#3a2800);color:var(--gold2);font-family:Rajdhani,sans-serif;border:1px solid rgba(212,160,23,.3);">
+      Request Withdrawal
+    </button>
+  </div>
+
   <div style="height:20px;"></div>
 
   <div class="bot-nav">
@@ -1416,6 +1466,32 @@ function copyRefLink(){
   toast("Referral link copied!", "var(--gold2)");
 }
 
+function requestWithdraw(){
+  var amt = parseFloat(document.getElementById("withdraw-amount").value) || 0;
+  var wallet = document.getElementById("withdraw-wallet").value.trim();
+  
+  if(amt < 1){ toast("Minimum withdrawal is 1 TON!", "var(--red)"); return; }
+  if(!wallet || wallet.length < 24){ toast("Enter a valid TON wallet address!", "var(--red)"); return; }
+  if(!ownedPackage){ toast("You need a mining package to withdraw!", "var(--red)"); return; }
+  
+  // Send withdrawal request via Telegram bot message
+  var msg = "WITHDRAW REQUEST\nUser: @" + UNAME + " (" + UID + ")\nAmount: " + amt + " TON\nWallet: " + wallet + "\nPTON Balance: " + ptonBalance.toFixed(2);
+  
+  // Save request locally
+  var requests = JSON.parse(localStorage.getItem("pton_withdrawals") || "[]");
+  requests.push({
+    amount: amt,
+    wallet: wallet,
+    date: new Date().toISOString(),
+    status: "pending"
+  });
+  localStorage.setItem("pton_withdrawals", JSON.stringify(requests));
+  
+  toast("Withdrawal request sent! Processing within 24-48h.", "var(--gold2)");
+  document.getElementById("withdraw-amount").value = "";
+  document.getElementById("withdraw-wallet").value = "";
+}
+
 function copyText(t){
   if(navigator.clipboard) navigator.clipboard.writeText(t).catch(()=>{});
   else{ const el=document.createElement("textarea");el.value=t;document.body.appendChild(el);el.select();document.execCommand("copy");document.body.removeChild(el); }
@@ -1451,6 +1527,9 @@ function confirmWallet(){
     saveState();
   }
   toast("Wallet connected!", "var(--gold3)");
+  // Pre-fill withdrawal wallet
+  var wInput = document.getElementById("withdraw-wallet");
+  if(wInput) wInput.value = addr;
 }
 
 // ── PAY MODAL ────────────────────────────────────────────────────────────────
@@ -1538,6 +1617,24 @@ function toast(msg, color){
 }
 
 // ── START ────────────────────────────────────────────────────────────────────
+function updateLaunchCountdown(){
+  var launch = new Date("2026-08-16T00:00:00Z");
+  var now = new Date();
+  var diff = Math.max(0, launch - now);
+  var days = Math.floor(diff / 86400000);
+  var hours = Math.floor((diff % 86400000) / 3600000);
+  var mins = Math.floor((diff % 3600000) / 60000);
+  
+  var str = days + "d " + hours + "h " + mins + "m";
+  
+  var el1 = document.getElementById("launch-countdown");
+  var el2 = document.getElementById("earn-launch-cd");
+  if(el1) el1.textContent = str;
+  if(el2) el2.textContent = days + " days";
+}
+setInterval(updateLaunchCountdown, 60000);
+updateLaunchCountdown();
+
 window.addEventListener("DOMContentLoaded", init);
 </script>
 </body>
