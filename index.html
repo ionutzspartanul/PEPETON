@@ -474,7 +474,7 @@ body{
     <button class="nav-btn active" onclick="navTo(this,'mine')"><div class="nav-icon">⛏</div>Mine<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'earn')"><div class="nav-icon">💰</div>Earn<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'nft')"><div class="nav-icon">🖼</div>NFT<div class="ndot"></div></button>
-    <button class="nav-btn" onclick="navTo(this,'p2p')"><div class="nav-icon">📈</div>P2P<div class="ndot"></div></button>
+    <button class="nav-btn" onclick="navTo(this,'arena')"><div class="nav-icon">⚔️</div>Arena<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'friends')"><div class="nav-icon">👥</div>Friends<div class="ndot"></div></button>
   </div>
 </div>
@@ -545,7 +545,7 @@ body{
     <button class="nav-btn" onclick="navTo(this,'mine')"><div class="nav-icon">⛏</div>Mine<div class="ndot"></div></button>
     <button class="nav-btn active" onclick="navTo(this,'earn')"><div class="nav-icon">💰</div>Earn<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'nft')"><div class="nav-icon">🖼</div>NFT<div class="ndot"></div></button>
-    <button class="nav-btn" onclick="navTo(this,'p2p')"><div class="nav-icon">📈</div>P2P<div class="ndot"></div></button>
+    <button class="nav-btn" onclick="navTo(this,'arena')"><div class="nav-icon">⚔️</div>Arena<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'friends')"><div class="nav-icon">👥</div>Friends<div class="ndot"></div></button>
   </div>
 </div>
@@ -567,7 +567,7 @@ body{
     <button class="nav-btn" onclick="navTo(this,'mine')"><div class="nav-icon">⛏</div>Mine<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'earn')"><div class="nav-icon">💰</div>Earn<div class="ndot"></div></button>
     <button class="nav-btn active" onclick="navTo(this,'nft')"><div class="nav-icon">🖼</div>NFT<div class="ndot"></div></button>
-    <button class="nav-btn" onclick="navTo(this,'p2p')"><div class="nav-icon">📈</div>P2P<div class="ndot"></div></button>
+    <button class="nav-btn" onclick="navTo(this,'arena')"><div class="nav-icon">⚔️</div>Arena<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'friends')"><div class="nav-icon">👥</div>Friends<div class="ndot"></div></button>
   </div>
 </div>
@@ -679,6 +679,92 @@ body{
     <button class="nav-btn" onclick="navTo(this,'nft')"><div class="nav-icon">🖼</div>NFT<div class="ndot"></div></button>
     <button class="nav-btn" onclick="navTo(this,'p2p')"><div class="nav-icon">📈</div>P2P<div class="ndot"></div></button>
     <button class="nav-btn active" onclick="navTo(this,'friends')"><div class="nav-icon">👥</div>Friends<div class="ndot"></div></button>
+  </div>
+</div>
+
+<!-- ARENA SCREEN -->
+<div class="screen" id="screen-arena">
+  <div class="hdr">
+    <div class="hdr-logo">PEPE<span>TON</span></div>
+    <div class="ton-badge">🏆 Arena</div>
+  </div>
+
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,#0a0000,#1a0500,#0a0000);padding:20px 16px;text-align:center;border-bottom:1px solid rgba(255,100,0,.3);position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,100,0,.1) 0%,transparent 60%);"></div>
+    <div style="position:relative;z-index:1;">
+      <div style="font-family:Cinzel Decorative,serif;font-size:24px;font-weight:900;color:#ff6400;text-shadow:0 0 30px rgba(255,100,0,.6);">⚔️ PEPETON ARENA</div>
+      <div style="font-size:12px;color:#888;margin-top:4px;">Weekly Mining Tournament</div>
+      <div style="margin-top:12px;display:flex;justify-content:center;gap:16px;">
+        <div style="text-align:center;">
+          <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">Season ends in</div>
+          <div style="font-size:20px;font-weight:900;color:#ff6400;" id="arena-countdown">--d --h --m</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">Prize Pool</div>
+          <div style="font-size:20px;font-weight:900;color:#ffd700;" id="arena-prize">-- $PTON</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">Players</div>
+          <div style="font-size:20px;font-weight:900;color:#39ff14;" id="arena-players">--</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Arena -->
+  <div id="arena-join-section" style="margin:14px 16px 0;background:linear-gradient(135deg,#1a0500,#2a0a00);border-radius:16px;padding:16px;border:1px solid rgba(255,100,0,.4);">
+    <div style="font-size:14px;font-weight:800;color:#ff6400;margin-bottom:8px;">🏆 How Arena Works</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+      <div style="font-size:12px;color:#ccc;">⚔️ Pay entry fee to join weekly tournament</div>
+      <div style="font-size:12px;color:#ccc;">⛏ Mine as much $PTON as possible in 7 days</div>
+      <div style="font-size:12px;color:#ffd700;font-weight:700;">🥇 Top 3 miners split the prize pool 50/30/20%</div>
+      <div style="font-size:12px;color:#39ff14;">✓ Entry fee goes into prize pool</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:rgba(255,100,0,.1);border:1px solid rgba(255,100,0,.3);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:#ff6400;">500</div>
+        <div style="font-size:10px;color:#888;">Stars Entry</div>
+      </div>
+      <div style="background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.3);border-radius:10px;padding:10px;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:#f0c040;">1 TON</div>
+        <div style="font-size:10px;color:#888;">TON Entry</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button onclick="joinArenaStars()" style="padding:12px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:800;background:linear-gradient(135deg,#aa7700,#ffcc00);color:#000;font-family:Rajdhani,sans-serif;">⭐ Join with Stars</button>
+      <button onclick="joinArenaTON()" style="padding:12px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:800;background:linear-gradient(135deg,#1a0800,#3a1500);color:#f0c040;border:1px solid rgba(212,160,23,.3);font-family:Rajdhani,sans-serif;">💎 Join with TON</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div style="padding:14px 16px 0;">
+    <div style="font-family:Cinzel Decorative,serif;font-size:12px;color:#ff6400;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+      🏆 Current Rankings
+      <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(255,100,0,.3),transparent);"></div>
+    </div>
+    <div id="arena-leaderboard">
+      <div style="text-align:center;padding:30px;color:#555;font-size:13px;">No participants yet.<br>Be the first to join!</div>
+    </div>
+  </div>
+
+  <!-- My Arena Stats -->
+  <div id="arena-my-stats" style="display:none;margin:14px 16px 0;background:var(--card);border-radius:14px;padding:14px;border:1px solid rgba(255,100,0,.3);">
+    <div style="font-size:13px;font-weight:700;color:#ff6400;margin-bottom:8px;">My Arena Stats</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:800;color:#f0c040;" id="my-arena-rank">#--</div><div style="font-size:10px;color:#888;">My Rank</div></div>
+      <div style="text-align:center;"><div style="font-size:18px;font-weight:800;color:#39ff14;" id="my-arena-pton">0</div><div style="font-size:10px;color:#888;">$PTON Mined</div></div>
+    </div>
+  </div>
+
+  <div style="height:80px;"></div>
+
+  <div class="bot-nav">
+    <button class="nav-btn" onclick="navTo(this,'mine')"><div class="nav-icon">⛏</div>Mine<div class="ndot"></div></button>
+    <button class="nav-btn" onclick="navTo(this,'earn')"><div class="nav-icon">💰</div>Earn<div class="ndot"></div></button>
+    <button class="nav-btn" onclick="navTo(this,'nft')"><div class="nav-icon">🖼</div>NFT<div class="ndot"></div></button>
+    <button class="nav-btn active" onclick="navTo(this,'arena')"><div class="nav-icon">⚔️</div>Arena<div class="ndot"></div></button>
+    <button class="nav-btn" onclick="navTo(this,'friends')"><div class="nav-icon">👥</div>Friends<div class="ndot"></div></button>
   </div>
 </div>
 
@@ -858,6 +944,7 @@ function init(){
     ptonBalance = 0;
   }
   checkDailyReset();
+  checkArenaReset();
   trackOpen();
   calcHashrate();
   updateMineUI();
@@ -1272,7 +1359,7 @@ function buyStarterPack(){
   var tkLink = "https://app.tonkeeper.com/transfer/" + OWNER +
     "?amount=" + nano + "&text=" + encodeURIComponent("PEPETON:STARTER:Pack");
   
-  showPayModal(5.0, "🎁 Starter Pack — Everything included", tkLink, function(){
+  showPayModalDual(5.0, 300, "🎁 Starter Pack — Everything included", tkLink, function(){
     // Activate starter package
     ownedPackage = "starter";
     var cfg = PKG_CONFIG["starter"];
@@ -1350,7 +1437,8 @@ function buyPackage(pkg, price){
   const tkLink = "https://app.tonkeeper.com/transfer/" + OWNER +
     "?amount=" + nano + "&text=" + encodeURIComponent(label);
 
-  showPayModal(price, cfg.emoji + " " + cfg.label + " Mining Package", tkLink, function(){
+  var starsPrice = {basic:50, pro:100, elite:200}[pkg] || 50;
+  showPayModalDual(price, starsPrice, cfg.emoji + " " + cfg.label + " Mining Package", tkLink, function(){
     ownedPackage = pkg;
     energy = cfg.maxEnergy;
     maxEnergy = cfg.maxEnergy;
@@ -1899,6 +1987,110 @@ function requestWithdraw(){
   document.getElementById("withdraw-wallet").value = "";
 }
 
+// ── ARENA ────────────────────────────────────────────────────────────────────
+var arenaJoined = localStorage.getItem("pton_arena_joined") === "1";
+var arenaJoinedTon = parseFloat(localStorage.getItem("pton_arena_mined") || "0");
+
+function getArenaWeekEnd(){
+  var now = new Date();
+  var day = now.getDay(); // 0=Sun, 1=Mon...
+  var daysUntilMonday = day === 0 ? 1 : 8 - day;
+  var end = new Date(now);
+  end.setDate(now.getDate() + daysUntilMonday);
+  end.setHours(0,0,0,0);
+  return end;
+}
+
+function updateArenaUI(){
+  // Countdown
+  var end = getArenaWeekEnd();
+  var diff = Math.max(0, end - new Date());
+  var days = Math.floor(diff/86400000);
+  var hours = Math.floor((diff%86400000)/3600000);
+  var mins = Math.floor((diff%3600000)/60000);
+  var cdEl = document.getElementById("arena-countdown");
+  if(cdEl) cdEl.textContent = days + "d " + hours + "h " + mins + "m";
+
+  // Simulate participants and prize pool
+  var weekNum = Math.floor(Date.now() / (7*24*60*60*1000));
+  var fakePlayers = 47 + (weekNum % 30);
+  var fakePrize = fakePlayers * 80;
+  var playersEl = document.getElementById("arena-players");
+  var prizeEl = document.getElementById("arena-prize");
+  if(playersEl) playersEl.textContent = fakePlayers + (arenaJoined ? " (you)" : "");
+  if(prizeEl) prizeEl.textContent = (fakePrize + (arenaJoined ? 80 : 0)).toLocaleString() + " $PTON";
+
+  // Show my stats if joined
+  var myStats = document.getElementById("arena-my-stats");
+  if(myStats) myStats.style.display = arenaJoined ? "block" : "none";
+  if(arenaJoined){
+    var myPton = ptonBalance;
+    var myRankEl = document.getElementById("my-arena-rank");
+    var myPtonEl = document.getElementById("my-arena-pton");
+    if(myRankEl) myRankEl.textContent = "#" + Math.max(1, Math.floor(Math.random()*10)+1);
+    if(myPtonEl) myPtonEl.textContent = Math.floor(myPton).toLocaleString();
+  }
+
+  // Fake leaderboard
+  var lb = document.getElementById("arena-leaderboard");
+  if(lb){
+    var players = [
+      {name:"@CryptoFrog_88", pton: 2840, badge:"🥇"},
+      {name:"@PepeKing", pton: 2105, badge:"🥈"},
+      {name:"@TON_Miner_X", pton: 1890, badge:"🥉"},
+      {name:"@BlazePepe", pton: 1234, badge:"4️⃣"},
+      {name:"@VoidHunter", pton: 987, badge:"5️⃣"},
+    ];
+    if(arenaJoined){
+      players.splice(2, 0, {name:"@" + UNAME + " (you)", pton: Math.floor(ptonBalance), badge:"⭐", isMe: true});
+      players = players.slice(0,5);
+    }
+    lb.innerHTML = players.map(function(p,i){
+      return "<div style='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);" + (p.isMe?"background:rgba(255,100,0,.05);border-radius:8px;padding:10px;":"") + "'>" +
+        "<div style='font-size:18px;width:30px;text-align:center;'>" + p.badge + "</div>" +
+        "<div style='flex:1;'><div style='font-size:13px;font-weight:700;color:" + (p.isMe?"#ff6400":"#f5e6c0") + ";'>" + p.name + "</div></div>" +
+        "<div style='font-size:13px;font-weight:800;color:#f0c040;'>" + p.pton.toLocaleString() + " $PTON</div>" +
+        "</div>";
+    }).join("");
+  }
+}
+
+function joinArenaStars(){
+  if(!ownedPackage){ toast("Buy a mining package first!", "var(--gold2)"); return; }
+  if(arenaJoined){ toast("Already in this week arena!", "var(--gold2)"); return; }
+  payWithStars(500, "PEPETON Arena Entry", function(){
+    arenaJoined = true;
+    localStorage.setItem("pton_arena_joined", "1");
+    updateArenaUI();
+    toast("Joined Arena! Mine as much as possible this week!", "var(--gold3)");
+  });
+}
+
+function joinArenaTON(){
+  if(!ownedPackage){ toast("Buy a mining package first!", "var(--gold2)"); return; }
+  if(arenaJoined){ toast("Already in this week arena!", "var(--gold2)"); return; }
+  if(!walletAddr){ toast("Connect wallet first!", "var(--gold2)"); connectWalletFlow(); return; }
+  var nano = Math.floor(1.0 * 1e9);
+  var tkLink = "https://app.tonkeeper.com/transfer/" + OWNER + "?amount=" + nano + "&text=PEPETON:ARENA:ENTRY";
+  showPayModal(1.0, "⚔️ Arena Entry — 1 TON", tkLink, function(){
+    arenaJoined = true;
+    localStorage.setItem("pton_arena_joined", "1");
+    updateArenaUI();
+    toast("Joined Arena! Mine as much as possible this week!", "var(--gold3)");
+  }, null);
+}
+
+// Reset arena weekly
+function checkArenaReset(){
+  var lastWeek = localStorage.getItem("pton_arena_week") || "0";
+  var currentWeek = Math.floor(Date.now() / (7*24*60*60*1000)).toString();
+  if(lastWeek !== currentWeek){
+    localStorage.setItem("pton_arena_week", currentWeek);
+    localStorage.setItem("pton_arena_joined", "0");
+    arenaJoined = false;
+  }
+}
+
 function copyText(t){
   if(navigator.clipboard) navigator.clipboard.writeText(t).catch(()=>{});
   else{ const el=document.createElement("textarea");el.value=t;document.body.appendChild(el);el.select();document.execCommand("copy");document.body.removeChild(el); }
@@ -1940,6 +2132,71 @@ function confirmWallet(){
 }
 
 // ── PAY MODAL ────────────────────────────────────────────────────────────────
+// Telegram Stars payment
+function payWithStars(starsAmount, label, onSuccess){
+  if(!tg){ toast("Open in Telegram to pay with Stars!", "var(--red)"); return; }
+  try{
+    tg.openInvoice(
+      "https://t.me/OfficialPepetonBot?start=stars_" + starsAmount + "_" + encodeURIComponent(label),
+      function(status){
+        if(status === "paid"){
+          toast("Stars payment confirmed!", "var(--gold3)");
+          if(onSuccess) onSuccess();
+        } else if(status === "cancelled"){
+          toast("Payment cancelled.", "var(--muted)");
+        } else {
+          toast("Payment failed. Try TON instead.", "var(--red)");
+        }
+      }
+    );
+  } catch(e){
+    // Fallback - Stars not supported, use TON
+    toast("Stars not available. Use TON payment.", "var(--gold2)");
+  }
+}
+
+function showPayModalDual(tonAmount, starsAmount, label, tkLink, onSuccess, onCancel){
+  var existing = document.getElementById("pay-modal");
+  if(existing) existing.remove();
+  window._paySuccess = onSuccess;
+  window._payNano = Math.floor(tonAmount * 1e9);
+
+  var modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.id = "pay-modal";
+  modal.innerHTML =
+    "<div style='background:#0a0800;border-radius:22px 22px 0 0;padding:22px 18px 34px;width:100%;max-width:480px;border:1px solid #2a2200;'>" +
+    "<div style='font-family:Cinzel Decorative,serif;font-size:16px;color:#f0c040;text-align:center;margin-bottom:6px;'>" + label + "</div>" +
+    "<div style='text-align:center;margin-bottom:16px;'>" +
+    "<span style='font-size:28px;font-weight:900;color:#f0c040;'>" + tonAmount.toFixed(2) + " TON</span>" +
+    "<span style='color:#555;margin:0 10px;'>or</span>" +
+    "<span style='font-size:28px;font-weight:900;color:#ffaa00;'>⭐ " + starsAmount + " Stars</span>" +
+    "</div>" +
+    "<button id='pay-stars-btn' style='width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;font-size:15px;font-weight:800;background:linear-gradient(135deg,#aa7700,#ffcc00);color:#000;margin-bottom:10px;font-family:Rajdhani,sans-serif;'>⭐ Pay with " + starsAmount + " Telegram Stars</button>" +
+    "<a id='pay-ton-btn' href='" + tkLink + "' style='display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;background:linear-gradient(135deg,#1a1200,#3a2800);color:#f0c040;text-align:center;text-decoration:none;box-sizing:border-box;margin-bottom:10px;font-family:Rajdhani,sans-serif;border:1px solid rgba(212,160,23,.3);'>💎 Pay with " + tonAmount.toFixed(2) + " TON</pa>" +
+    "<div id='pay-verify-area' style='display:none;margin-bottom:8px;'>" +
+    "<button class='verify-btn' id='pm-verify-btn' onclick='verifyGenericPayment(" + Math.floor(tonAmount*1e9) + ")'>Verify TON Payment</button>" +
+    "</div>" +
+    "<button onclick='document.getElementById("pay-modal").remove()' style='width:100%;padding:10px;border:none;background:transparent;color:#555;cursor:pointer;font-family:Rajdhani,sans-serif;'>Cancel</button>" +
+    "</div>";
+
+  document.body.appendChild(modal);
+  modal.addEventListener("click", function(e){ if(e.target===modal){ modal.remove(); if(onCancel) onCancel(); } });
+
+  document.getElementById("pay-stars-btn").addEventListener("click", function(){
+    modal.remove();
+    payWithStars(starsAmount, label, onSuccess);
+  });
+
+  document.getElementById("pay-ton-btn").addEventListener("click", function(e){
+    if(tg && tg.openLink){ e.preventDefault(); tg.openLink(tkLink); }
+    setTimeout(function(){
+      var va = document.getElementById("pay-verify-area");
+      if(va) va.style.display = "block";
+    }, 3000);
+  });
+}
+
 function showPayModal(amount, label, tkLink, onSuccess, onCancel){
   const existing = document.getElementById("pay-modal");
   if(existing) existing.remove();
@@ -2009,6 +2266,7 @@ function navTo(btn, name){
   window.scrollTo(0, 0);
   if(name === "earn"){ renderDailyTasks(); renderTasks(); renderBoxes(); }
   if(name === "nft"){ loadStock().then(renderNFTs); }
+  if(name === "arena"){ checkArenaReset(); updateArenaUI(); setInterval(updateArenaUI, 60000); }
 }
 
 // ── TOAST ────────────────────────────────────────────────────────────────────
